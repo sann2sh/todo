@@ -1,0 +1,7 @@
+node_modules/
+.env
+data/auth-config.json
+data/*.tmp
+.DS_Store
+*.log
+data/tasks.csv

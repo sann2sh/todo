@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Personal Kanban Task Manager with CSV Persistent Storage.">
+  <title>Todo list</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/global.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- ========================================== -->
+  <!-- MAIN APPLICATION SHELL                     -->
+  <!-- ========================================== -->
+  <div id="app-container" class="hidden">
+
+    <!-- Topbar Navigation -->
+    <header class="topbar">
+      <div class="topbar-brand">
+        <div class="brand-icon-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <span class="topbar-brand-text">Todo list</span>
+
+      </div>
+
+      <div class="topbar-controls">
+        <!-- Search Input -->
+        <div style="position:relative; display:inline-flex; align-items:center;">
+          <input type="text" id="search-input" class="form-input" placeholder="🔍 Search tasks... (/)"
+            style="width:200px; padding-right:28px;">
+          <button id="clear-search-btn" class="hidden"
+            style="position:absolute; right:8px; background:none; border:none; cursor:pointer; color:var(--gray-400); font-size:16px;">&times;</button>
+        </div>
+
+        <!-- Priority Filter Select -->
+        <select id="priority-filter" class="form-select" style="width:140px;" aria-label="Filter tasks by priority">
+          <option value="all">All Priorities</option>
+          <option value="high">🔥 High</option>
+          <option value="medium">⚡ Medium</option>
+          <option value="low">🌿 Low</option>
+        </select>
+
+        <!-- New Task Button -->
+        <button id="new-task-btn" class="btn btn-primary">
+          <span>➕ New Task</span>
+          <span
+            style="background:rgba(255,255,255,0.25); border-radius:4px; padding:2px 6px; font-size:10px; font-family:monospace; margin-left:4px;">N</span>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button id="theme-toggle-btn" class="btn btn-outline" title="Toggle Light / Dark mode"
+          aria-label="Toggle Theme">
+          <span id="theme-icon">🌙</span>
+        </button>
+
+        <!-- Unified Account Dropdown Menu -->
+        <div class="account-menu-wrapper">
+          <button id="account-btn" class="btn btn-outline" title="Account & Settings" aria-haspopup="true"
+            aria-expanded="false">
+            <span>👤 Account</span>
+            <span style="font-size:10px; margin-left:3px;">▾</span>
+          </button>
+          <div id="account-dropdown" class="account-dropdown hidden">
+            <button id="settings-btn" class="dropdown-item">
+              <span>⚙️ Change Password</span>
+            </button>
+            <div class="dropdown-divider"></div>
+            <button id="logout-btn" class="dropdown-item dropdown-item-danger">
+              <span>🚪 Log Out</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Progress Meter Strip -->
+    <div class="progress-strip">
+      <div id="progress-bar-fill" class="progress-strip-fill" style="width: 0%;"></div>
+    </div>
+
+    <!-- Main Content Container (Pushes footer to bottom) -->
+    <main class="container main-content-wrapper" style="padding-top: var(--sp-6); padding-bottom: var(--sp-12);">
+
+      <!-- Dashboard Stat Cards Overview -->
+      <section class="metrics-section">
+        <div class="metrics-grid">
+
+          <div class="stat-card animate-in">
+            <div class="stat-icon primary">📋</div>
+            <div>
+              <div class="stat-value" id="stat-total-count">0</div>
+              <div class="stat-label">Total Tasks</div>
+            </div>
+          </div>
+
+          <div class="stat-card animate-in" style="animation-delay: 0.05s;">
+            <div class="stat-icon info">📌</div>
+            <div>
+              <div class="stat-value" id="stat-todo-count">0</div>
+              <div class="stat-label">To Do</div>
+            </div>
+          </div>
+
+          <div class="stat-card animate-in" style="animation-delay: 0.1s;">
+            <div class="stat-icon warning">⏰</div>
+            <div>
+              <div class="stat-value" id="stat-prog-count">0</div>
+              <div class="stat-label">In Progress</div>
+            </div>
+          </div>
+
+          <div class="stat-card animate-in" style="animation-delay: 0.15s;">
+            <div class="stat-icon success">✓</div>
+            <div>
+              <div class="stat-value" id="stat-done-count">0</div>
+              <div class="stat-label">Completed</div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Kanban Columns Board -->
+      <section class="kanban-grid">
+
+        <!-- COLUMN 1: TO DO -->
+        <div class="kanban-column" id="column-todo" data-status="todo">
+          <div class="kanban-column-header">
+            <div class="kanban-column-title">
+              <span>📌 To Do</span>
+              <span class="badge badge-pending" id="count-todo">0</span>
+            </div>
+            <button class="btn btn-outline btn-sm column-quick-add" data-status="todo" title="Quick add task">➕</button>
+          </div>
+          <div class="kanban-dropzone" id="cards-todo" data-status="todo">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- COLUMN 2: IN PROGRESS -->
+        <div class="kanban-column" id="column-in-progress" data-status="in_progress">
+          <div class="kanban-column-header">
+            <div class="kanban-column-title">
+              <span>⏰ In Progress</span>
+              <span class="badge badge-expiring" id="count-in_progress">0</span>
+            </div>
+            <button class="btn btn-outline btn-sm column-quick-add" data-status="in_progress"
+              title="Quick add task">➕</button>
+          </div>
+          <div class="kanban-dropzone" id="cards-in_progress" data-status="in_progress">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- COLUMN 3: DONE -->
+        <div class="kanban-column" id="column-done" data-status="done">
+          <div class="kanban-column-header">
+            <div class="kanban-column-title">
+              <span>✓ Completed</span>
+              <span class="badge badge-active" id="count-done">0</span>
+            </div>
+            <button class="btn btn-outline btn-sm column-quick-add" data-status="done" title="Quick add task">➕</button>
+          </div>
+          <div class="kanban-dropzone" id="cards-done" data-status="done">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- Footer Pinned at Bottom of Screen -->
+    <footer class="app-footer">
+      Todo list
+    </footer>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- LOGIN SCREEN                               -->
+  <!-- ========================================== -->
+  <div id="login-overlay" class="login-screen">
+    <div class="login-card animate-in">
+      <div class="login-icon-box">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+      </div>
+      <h1>Personal Workspace</h1>
+      <p>Enter your password to unlock the Kanban board</p>
+
+      <form id="login-form" novalidate>
+        <div class="form-group" style="text-align:left; margin-bottom:var(--sp-4);">
+          <label class="form-label" for="login-password">Access Password <span class="required">*</span></label>
+          <div style="position:relative; display:flex; align-items:center;">
+            <input type="password" id="login-password" class="form-input" placeholder="Enter password..." required
+              autofocus autocomplete="current-password">
+            <button type="button" id="toggle-login-pw"
+              style="position:absolute; right:10px; background:none; border:none; cursor:pointer; color:var(--gray-400); font-size:16px;">👁️</button>
+          </div>
+        </div>
+
+        <div id="login-error" class="hidden"
+          style="background:var(--danger-light); color:#991B1B; padding:var(--sp-3); border-radius:var(--radius); font-size:var(--text-xs); margin-bottom:var(--sp-4); text-align:left;">
+        </div>
+
+        <button type="submit" id="login-submit-btn" class="btn btn-primary w-full" style="padding:12px;">
+          <span>Unlock Board →</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- ADD / EDIT TASK MODAL                      -->
+  <!-- ========================================== -->
+  <div class="modal-overlay" id="task-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-task-heading">Add New Task</h3>
+        <button class="modal-close" id="modal-close-btn">&times;</button>
+      </div>
+
+      <form id="task-form" novalidate>
+        <input type="hidden" id="task-id">
+
+        <div class="modal-body" style="display:flex; flex-direction:column; gap:var(--sp-4);">
+          <div class="form-group">
+            <label class="form-label" for="task-title">Title <span class="required">*</span></label>
+            <input type="text" id="task-title" class="form-input" placeholder="e.g. Set up SSL certificates" required
+              maxlength="150" autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="task-desc">Description</label>
+            <textarea id="task-desc" class="form-textarea" rows="3"
+              placeholder="Task details, checklist, or notes..."></textarea>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-4);">
+            <div class="form-group">
+              <label class="form-label" for="task-status">Status</label>
+              <select id="task-status" class="form-select">
+                <option value="todo">📌 To Do</option>
+                <option value="in_progress">⏰ In Progress</option>
+                <option value="done">✓ Done</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="task-priority">Priority</label>
+              <select id="task-priority" class="form-select">
+                <option value="medium">⚡ Medium</option>
+                <option value="high">🔥 High</option>
+                <option value="low">🌿 Low</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="task-due-date">Due Date</label>
+            <input type="date" id="task-due-date" class="form-input">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="cancel-task-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="save-task-btn">Save Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- Change Password / PASSWORD MODAL         -->
+  <!-- ========================================== -->
+  <div class="modal-overlay" id="settings-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Change Password</h3>
+        <button class="modal-close" id="settings-close-btn">&times;</button>
+      </div>
+
+      <form id="password-form" novalidate>
+        <div class="modal-body" style="display:flex; flex-direction:column; gap:var(--sp-4);">
+          <p class="text-sm text-muted">Update your master access password. Changes apply immediately to all sessions.
+          </p>
+
+          <div class="form-group">
+            <label class="form-label" for="current-password">Current Password <span class="required">*</span></label>
+            <input type="password" id="current-password" class="form-input" required
+              placeholder="Enter current password">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="new-password">New Password <span class="required">*</span></label>
+            <input type="password" id="new-password" class="form-input" required minlength="4"
+              placeholder="Minimum 4 characters">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="confirm-password">Confirm New Password <span
+                class="required">*</span></label>
+            <input type="password" id="confirm-password" class="form-input" required minlength="4"
+              placeholder="Repeat new password">
+          </div>
+
+          <div id="password-error" class="hidden"
+            style="background:var(--danger-light); color:#991B1B; padding:var(--sp-3); border-radius:var(--radius); font-size:var(--text-xs);">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="cancel-password-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="assets/js/global.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>

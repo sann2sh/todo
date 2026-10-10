@@ -1,0 +1,20 @@
+[Unit]
+Description=Flow Kanban Personal Todo Service
+After=network.target
+
+[Service]
+Type=simple
+User=san
+WorkingDirectory=/var/www/todo.skisub.com
+ExecStart=/usr/bin/node --max-old-space-size=128 server.js
+Restart=always
+RestartSec=5
+Environment=NODE_ENV=production
+EnvironmentFile=-/var/www/todo.skisub.com/.env
+
+# Hardening / Low Resource Limits for GCP e2-micro (1GB RAM)
+MemoryMax=256M
+CPUQuota=50%
+
+[Install]
+WantedBy=multi-user.target

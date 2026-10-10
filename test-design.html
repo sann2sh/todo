@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSMS — Design System Preview</title>
+    <link rel="stylesheet" href="assets/css/global.css">
+    <style>
+        .preview-section {
+            margin-bottom: var(--sp-10);
+        }
+        .preview-section > h2 {
+            margin-bottom: var(--sp-4);
+            padding-bottom: var(--sp-3);
+            border-bottom: 2px solid var(--gray-200);
+        }
+        .preview-section > h2 span {
+            font-size: var(--text-sm);
+            font-weight: 400;
+            color: var(--gray-400);
+            margin-left: var(--sp-3);
+        }
+        .color-grid { display: flex; flex-wrap: wrap; gap: var(--sp-3); }
+        .color-swatch {
+            width: 80px; text-align: center;
+        }
+        .color-swatch .swatch {
+            width: 80px; height: 56px; border-radius: var(--radius);
+            border: 1px solid var(--gray-200); margin-bottom: var(--sp-1);
+        }
+        .color-swatch .label { font-size: var(--text-xs); color: var(--gray-500); }
+        .btn-row { display: flex; flex-wrap: wrap; gap: var(--sp-3); align-items: center; }
+        .demo-sidebar { position: relative; height: auto; width: 260px; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); overflow: hidden; }
+    </style>
+</head>
+<body style="background: var(--gray-50);">
+
+<div class="container" style="padding-top: var(--sp-10); padding-bottom: var(--sp-16);">
+
+    <!-- Header -->
+    <div style="margin-bottom: var(--sp-12); text-align: center;">
+        <div style="display:inline-flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-4);">
+            <img src="https://admin.skisolutions.digital/assets/logo.png" alt="Logo" class="sidebar-brand-logo" style="background:transparent; box-shadow:none; border-radius:0; object-fit:contain; padding:2px;">
+            <span style="font-size:var(--text-2xl);font-weight:800;color:var(--gray-900);">SSMS Design System</span>
+        </div>
+        <p class="text-muted">Preview of all UI components for the Subscription Management System</p>
+    </div>
+
+    <!-- Colors -->
+    <div class="preview-section">
+        <h2>🎨 Colors <span>Brand, status, and service colors</span></h2>
+        <h4 style="margin-bottom:var(--sp-3);">Brand</h4>
+        <div class="color-grid" style="margin-bottom:var(--sp-6);">
+            <div class="color-swatch"><div class="swatch" style="background:var(--primary);"></div><div class="label">Primary</div></div>
+            <div class="color-swatch"><div class="swatch" style="background:var(--primary-hover);"></div><div class="label">Primary Hover</div></div>
+            <div class="color-swatch"><div class="swatch" style="background:var(--primary-light);"></div><div class="label">Primary Light</div></div>
+            <div class="color-swatch"><div class="swatch" style="background:var(--accent);"></div><div class="label">Accent</div></div>
+        </div>
+        <h4 style="margin-bottom:var(--sp-3);">Status</h4>
+        <div class="color-grid" style="margin-bottom:var(--sp-6);">
+            <div class="color-swatch"><div class="swatch" style="background:var(--success);"></div><div class="label">Success</div></div>
+            <div class="color-swatch"><div class="swatch" style="background:var(--warning);"></div><div class="label">Warning</div></div>
+            <div class="color-swatch"><div class="swatch" style="background:var(--danger);"></div><div class="label">Danger</div></div>
+            <div class="color-swatch"><div class="swatch" style="background:var(--info);"></div><div class="label">Info</div></div>
+        </div>
+        <h4 style="margin-bottom:var(--sp-3);">Services</h4>
+        <div class="color-grid">
+            <div class="color-swatch"><div class="swatch" style="background:var(--netflix);"></div><div class="label">Netflix</div></div>
+            <div class="color-swatch"><div class="swatch" style="background:var(--amazon);"></div><div class="label">Amazon</div></div>
+            <div class="color-swatch"><div class="swatch" style="background:var(--spotify);"></div><div class="label">Spotify</div></div>
+        </div>
+    </div>
+
+    <!-- Typography -->
+    <div class="preview-section">
+        <h2>📝 Typography <span>Inter font family</span></h2>
+        <div class="card">
+            <div class="card-body" style="display:flex;flex-direction:column;gap:var(--sp-4);">
+                <h1>Heading 1 — Dashboard Overview</h1>
+                <h2>Heading 2 — Account Management</h2>
+                <h3>Heading 3 — Active Subscriptions</h3>
+                <h4>Heading 4 — Customer Details</h4>
+                <p>Body text — This is how regular paragraph text looks. Clean, readable, and comfortable for daily use by an admin managing subscriptions.</p>
+                <p class="text-sm text-muted">Small muted text — Used for hints, timestamps, and secondary information.</p>
+                <p class="text-xs text-muted">Extra small — Last updated 2 hours ago</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="preview-section">
+        <h2>📊 Stat Cards <span>Dashboard overview metrics</span></h2>
+        <div class="grid grid-cols-4 gap-6">
+            <div class="stat-card animate-in">
+                <div class="stat-icon primary">📺</div>
+                <div>
+                    <div class="stat-value">24</div>
+                    <div class="stat-label">Total Accounts</div>
+                </div>
+            </div>
+            <div class="stat-card animate-in" style="animation-delay:0.1s;">
+                <div class="stat-icon success">✓</div>
+                <div>
+                    <div class="stat-value">89</div>
+                    <div class="stat-label">Active Customers</div>
+                </div>
+            </div>
+            <div class="stat-card animate-in" style="animation-delay:0.2s;">
+                <div class="stat-icon warning">⏰</div>
+                <div>
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Expiring Soon</div>
+                </div>
+            </div>
+            <div class="stat-card animate-in" style="animation-delay:0.3s;">
+                <div class="stat-icon danger">✕</div>
+                <div>
+                    <div class="stat-value">5</div>
+                    <div class="stat-label">Expired</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="preview-section">
+        <h2>🔘 Buttons <span>All button variants and sizes</span></h2>
+        <div class="card">
+            <div class="card-body" style="display:flex;flex-direction:column;gap:var(--sp-6);">
+                <div>
+                    <p class="text-sm font-semibold mb-4">Variants</p>
+                    <div class="btn-row">
+                        <button class="btn btn-primary">Primary</button>
+                        <button class="btn btn-success">Success</button>
+                        <button class="btn btn-danger">Danger</button>
+                        <button class="btn btn-warning">Warning</button>
+                        <button class="btn btn-outline">Outline</button>
+                        <button class="btn btn-ghost">Ghost</button>
+                        <button class="btn btn-primary" disabled>Disabled</button>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold mb-4">Sizes</p>
+                    <div class="btn-row">
+                        <button class="btn btn-primary btn-sm">Small</button>
+                        <button class="btn btn-primary">Default</button>
+                        <button class="btn btn-primary btn-lg">Large</button>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold mb-4">With Icons</p>
+                    <div class="btn-row">
+                        <button class="btn btn-primary">➕ Create Order</button>
+                        <button class="btn btn-success">✉ Send Credentials</button>
+                        <button class="btn btn-danger">🗑 Delete</button>
+                        <button class="btn btn-outline">🔄 Refresh</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Badges -->
+    <div class="preview-section">
+        <h2>🏷️ Badges <span>Status and service badges</span></h2>
+        <div class="card">
+            <div class="card-body">
+                <div class="btn-row" style="margin-bottom:var(--sp-4);">
+                    <span class="badge badge-active">● Active</span>
+                    <span class="badge badge-expiring">● Expiring Soon</span>
+                    <span class="badge badge-expired">● Expired</span>
+                    <span class="badge badge-pending">● Pending</span>
+                </div>
+                <div class="btn-row">
+                    <span class="badge badge-netflix">🎬 Netflix</span>
+                    <span class="badge badge-amazon">📦 Amazon Prime</span>
+                    <span class="badge badge-spotify">🎵 Spotify</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Slots -->
+    <div class="preview-section">
+        <h2>👤 Profile Slots <span>Account profile availability indicator</span></h2>
+        <div class="card">
+            <div class="card-body" style="display:flex;flex-direction:column;gap:var(--sp-6);">
+                <div>
+                    <p class="text-sm font-semibold mb-4">Netflix Account — 3/5 Occupied</p>
+                    <div class="slot-grid">
+                        <div class="slot occupied" title="Ram (Active)">R</div>
+                        <div class="slot occupied" title="Sita (Active)">S</div>
+                        <div class="slot occupied" title="Hari (Expiring)">H</div>
+                        <div class="slot available" title="Available">+</div>
+                        <div class="slot available" title="Available">+</div>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold mb-4">Spotify Account — 5/5 Full</p>
+                    <div class="slot-grid">
+                        <div class="slot occupied">A</div>
+                        <div class="slot occupied">B</div>
+                        <div class="slot occupied">C</div>
+                        <div class="slot occupied">D</div>
+                        <div class="slot occupied">E</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forms -->
+    <div class="preview-section">
+        <h2>📋 Forms <span>Input fields, selects, and validation</span></h2>
+        <div class="card">
+            <div class="card-header"><h3>Create New Order</h3></div>
+            <div class="card-body">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-5);">
+                    <div class="form-group">
+                        <label class="form-label">Customer Name <span class="required">*</span></label>
+                        <input type="text" class="form-input" placeholder="Enter customer name" value="Ram Bahadur">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email <span class="required">*</span></label>
+                        <input type="email" class="form-input" placeholder="customer@email.com" value="ram@gmail.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-input" placeholder="+977-98XXXXXXXX">
+                        <span class="form-hint">Include country code</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Streaming Service <span class="required">*</span></label>
+                        <select class="form-select">
+                            <option>Select service...</option>
+                            <option selected>🎬 Netflix</option>
+                            <option>📦 Amazon Prime</option>
+                            <option>🎵 Spotify</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Duration</label>
+                        <select class="form-select">
+                            <option selected>1 Month</option>
+                            <option>2 Months</option>
+                            <option>3 Months</option>
+                            <option>6 Months</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Error State Example</label>
+                        <input type="text" class="form-input error" value="invalid input">
+                        <span class="form-error">This field is required</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer" style="display:flex;justify-content:flex-end;gap:var(--sp-3);">
+                <button class="btn btn-outline">Cancel</button>
+                <button class="btn btn-primary">➕ Create Order</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="preview-section">
+        <h2>📊 Table <span>Data tables with hover states</span></h2>
+        <div class="card">
+            <div class="card-header">
+                <h3>Active Subscriptions</h3>
+                <button class="btn btn-primary btn-sm">➕ New Order</button>
+            </div>
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Service</th>
+                            <th>Account</th>
+                            <th>Profile</th>
+                            <th>Expires</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Ram Bahadur</strong><br><span class="text-xs text-muted">ram@gmail.com</span></td>
+                            <td><span class="badge badge-netflix">Netflix</span></td>
+                            <td>nf_acc***@gmail.com</td>
+                            <td>Profile 1</td>
+                            <td>Jun 15, 2026</td>
+                            <td><span class="badge badge-active">● Active</span></td>
+                            <td><button class="btn btn-ghost btn-sm">✏️</button> <button class="btn btn-ghost btn-sm">🔄</button></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sita Sharma</strong><br><span class="text-xs text-muted">sita@gmail.com</span></td>
+                            <td><span class="badge badge-amazon">Amazon</span></td>
+                            <td>am_acc***@gmail.com</td>
+                            <td>Profile 3</td>
+                            <td>May 28, 2026</td>
+                            <td><span class="badge badge-expiring">● Expiring</span></td>
+                            <td><button class="btn btn-ghost btn-sm">✏️</button> <button class="btn btn-ghost btn-sm">🔄</button></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hari Prasad</strong><br><span class="text-xs text-muted">hari@gmail.com</span></td>
+                            <td><span class="badge badge-spotify">Spotify</span></td>
+                            <td>sp_acc***@gmail.com</td>
+                            <td>Profile 2</td>
+                            <td>May 10, 2026</td>
+                            <td><span class="badge badge-expired">● Expired</span></td>
+                            <td><button class="btn btn-ghost btn-sm">✏️</button> <button class="btn btn-ghost btn-sm">🔄</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Demo -->
+    <div class="preview-section">
+        <h2>💬 Modal & Toast <span>Interactive components</span></h2>
+        <div class="card">
+            <div class="card-body">
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="openModal('demo-modal')">Open Modal</button>
+                    <button class="btn btn-success" onclick="showToast('Credentials sent successfully!', 'success')">Toast: Success</button>
+                    <button class="btn btn-danger" onclick="showToast('Failed to update password.', 'error')">Toast: Error</button>
+                    <button class="btn btn-warning" onclick="showToast('Subscription expiring in 3 days!', 'warning')">Toast: Warning</button>
+                    <button class="btn btn-outline" onclick="showToast('New customer registered.', 'info')">Toast: Info</button>
+                    <button class="btn btn-danger" onclick="confirmAction('Are you sure you want to terminate this subscription? This action cannot be undone.', () => showToast('Subscription terminated.', 'success'), 'Terminate')">Confirm Dialog</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Preview -->
+    <div class="preview-section">
+        <h2>📱 Sidebar Navigation <span>Admin layout sidebar</span></h2>
+        <div class="demo-sidebar">
+            <div class="sidebar-brand">
+                <img src="https://admin.skisolutions.digital/assets/logo.png" alt="Logo" class="sidebar-brand-logo" style="background:transparent; box-shadow:none; border-radius:0; object-fit:contain; padding:2px;">
+                <span class="sidebar-brand-text">SSMS</span>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="sidebar-nav-label">Main</div>
+                <a href="#" class="nav-item active">
+                    <span class="nav-item-icon">📊</span> Dashboard
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-item-icon">📺</span> Accounts
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-item-icon">📦</span> Orders
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-item-icon">👥</span> Customers
+                </a>
+                <div class="sidebar-nav-label">System</div>
+                <a href="#" class="nav-item">
+                    <span class="nav-item-icon">📧</span> Email Log
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-item-icon">⚙️</span> Settings
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" class="nav-item">
+                    <span class="nav-item-icon">🚪</span> Logout
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading & Empty States -->
+    <div class="preview-section">
+        <h2>⏳ Loading & Empty States</h2>
+        <div class="grid grid-cols-2 gap-6">
+            <div class="card">
+                <div class="card-header"><h4>Loading Spinner</h4></div>
+                <div class="card-body" style="display:flex;align-items:center;justify-content:center;gap:var(--sp-6);padding:var(--sp-10);">
+                    <div class="spinner"></div>
+                    <div class="spinner spinner-lg"></div>
+                    <button class="btn btn-primary" disabled>
+                        <div class="spinner"></div> Loading...
+                    </button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><h4>Empty State</h4></div>
+                <div class="empty-state" style="padding:var(--sp-10);">
+                    <div class="empty-state-icon">📭</div>
+                    <div class="empty-state-text">No orders found</div>
+                    <div class="empty-state-sub">Create your first order to get started</div>
+                    <button class="btn btn-primary mt-4">➕ Create Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Demo Modal -->
+<div class="modal-overlay" id="demo-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Update Account Password</h3>
+            <button class="modal-close" onclick="closeModal('demo-modal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div style="display:flex;flex-direction:column;gap:var(--sp-5);">
+                <div class="form-group">
+                    <label class="form-label">Account</label>
+                    <input type="text" class="form-input" value="netflix_acc1@gmail.com" disabled>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">New Password <span class="required">*</span></label>
+                    <input type="text" class="form-input" placeholder="Enter new password">
+                </div>
+                <div style="background:var(--warning-light);padding:var(--sp-4);border-radius:var(--radius);font-size:var(--text-sm);color:#92400E;">
+                    ⚠️ This will send updated credentials to 3 active customers on this account.
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('demo-modal')">Cancel</button>
+            <button class="btn btn-primary" onclick="closeModal('demo-modal'); showToast('Password updated & credentials sent!', 'success')">Update & Notify</button>
+        </div>
+    </div>
+</div>
+
+<script src="assets/js/global.js"></script>
+</body>
+</html>

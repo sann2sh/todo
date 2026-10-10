@@ -1,0 +1,108 @@
+/* ═══════════════════════════════════════════════════════════
+   SSMS — Admin-Specific Styles
+   ═══════════════════════════════════════════════════════════ */
+
+/* ─── Filter Buttons ──────────────────────────────────────── */
+.filter-btn {
+    background: var(--gray-100);
+    color: var(--gray-600);
+    border: 1px solid transparent;
+    transition: all var(--transition);
+}
+.filter-btn:hover {
+    background: var(--gray-200);
+}
+.filter-btn.active {
+    background: var(--primary-light);
+    color: var(--primary);
+    border-color: var(--primary-50);
+    font-weight: 600;
+}
+
+/* ─── Account Cards ───────────────────────────────────────── */
+.card .slot-grid {
+    margin-top: var(--sp-1);
+}
+
+/* ─── Order Wizard Steps ──────────────────────────────────── */
+.wizard-steps {
+    display: flex;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-8);
+}
+.wizard-step {
+    flex: 1;
+    text-align: center;
+    padding: var(--sp-3);
+    border-radius: var(--radius);
+    background: var(--gray-100);
+    color: var(--gray-400);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    transition: all var(--transition);
+}
+.wizard-step.active {
+    background: var(--primary);
+    color: var(--white);
+}
+.wizard-step.completed {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+/* ─── Service Tabs ────────────────────────────────────────── */
+.service-tab {
+    padding: var(--sp-3) var(--sp-5);
+    border-radius: var(--radius-full);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition);
+    border: 1px solid var(--gray-200);
+    background: var(--white);
+    color: var(--gray-600);
+}
+.service-tab:hover {
+    border-color: var(--gray-300);
+    background: var(--gray-50);
+}
+.service-tab.active {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+/* ─── Profile Selector ────────────────────────────────────── */
+.profile-option {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-4);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all var(--transition);
+}
+.profile-option:hover {
+    border-color: var(--primary-50);
+    background: var(--gray-50);
+}
+.profile-option.selected {
+    border-color: var(--primary);
+    background: var(--primary-light);
+}
+.profile-option.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ─── Dashboard Grid ──────────────────────────────────────── */
+.dashboard-section {
+    margin-bottom: var(--sp-8);
+}
+.dashboard-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--sp-4);
+}
