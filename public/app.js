@@ -50,6 +50,7 @@
     newTaskBtn: document.getElementById('new-task-btn'),
     accountBtn: document.getElementById('account-btn'),
     accountDropdown: document.getElementById('account-dropdown'),
+    copyAutologinBtn: document.getElementById('copy-autologin-btn'),
     logoutBtn: document.getElementById('logout-btn'),
     themeToggleBtn: document.getElementById('theme-toggle-btn'),
     themeIcon: document.getElementById('theme-icon'),
@@ -85,11 +86,23 @@
       .replace(/'/g, '&#039;');
   }
 
+  // Auto-Login: Extract and store ?key= parameter if opened via auto-login link
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlKey = urlParams.get('key');
+    if (urlKey) {
+      localStorage.setItem('todo_device_key', urlKey.trim());
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  } catch (e) {}
+
   // --- API Client ---
   async function api(endpoint, options = {}) {
+    const deviceKey = localStorage.getItem('todo_device_key') || '';
     const res = await fetch(endpoint, {
       headers: {
         'Content-Type': 'application/json',
+        'X-Device-Key': deviceKey,
         ...(options.headers || {})
       },
       ...options
@@ -131,10 +144,18 @@
 
   // --- Auth Flow ---
   async function checkAuth() {
+    const deviceKey = localStorage.getItem('todo_device_key') || '';
     try {
-      const res = await fetch('/api/auth/check');
+      const res = await fetch('/api/auth/check', {
+        headers: {
+          'X-Device-Key': deviceKey
+        }
+      });
       const data = await res.json();
       if (data.authenticated) {
+        if (data.deviceKey) {
+          localStorage.setItem('todo_device_key', data.deviceKey);
+        }
         setAuthenticated(true);
         loadTasks();
       } else {
@@ -188,9 +209,13 @@
         return;
       }
 
+      if (data.deviceKey) {
+        localStorage.setItem('todo_device_key', data.deviceKey);
+      }
+
       setAuthenticated(true);
       if (typeof showToast === 'function') {
-        showToast('Welcome back! Tasks loaded.', 'success');
+        showToast('Device authorized! Auto-login is now active.', 'success');
       }
       loadTasks();
     } catch (err) {
@@ -210,9 +235,10 @@
   elements.logoutBtn.addEventListener('click', () => {
     if (elements.accountDropdown) elements.accountDropdown.classList.add('hidden');
     confirmAction(
-      'Are you sure you want to log out of your workspace?',
+      'Are you sure you want to log out of your workspace? (This will remove auto-login from this browser)',
       async () => {
         try {
+          localStorage.removeItem('todo_device_key');
           await fetch('/api/auth/logout', { method: 'POST' });
           if (typeof showToast === 'function') {
             showToast('Logged out securely.', 'info');
@@ -266,9 +292,12 @@
         body: JSON.stringify({ currentPassword, newPassword })
       });
 
+      // Clear local device key so current device also re-authenticates with new password
+      localStorage.removeItem('todo_device_key');
       elements.settingsModal.classList.remove('active');
+      showLogin();
       if (typeof showToast === 'function') {
-        showToast('Password changed successfully!', 'success');
+        showToast('Password changed! All devices have been logged out. Please log in with your new password.', 'info');
       }
     } catch (err) {
       elements.passwordError.textContent = err.message;
@@ -432,6 +461,39 @@
     document.addEventListener('click', (e) => {
       if (!elements.accountDropdown.contains(e.target) && e.target !== elements.accountBtn) {
         elements.accountDropdown.classList.add('hidden');
+      }
+    });
+  }
+
+  // Copy Auto-Login Link (for one-click permanent login on mobile or other personal devices)
+  if (elements.copyAutologinBtn) {
+    elements.copyAutologinBtn.addEventListener('click', async () => {
+      if (elements.accountDropdown) elements.accountDropdown.classList.add('hidden');
+      let key = localStorage.getItem('todo_device_key');
+      if (!key) {
+        try {
+          const res = await api('/api/auth/device-key');
+          if (res.deviceKey) {
+            key = res.deviceKey;
+            localStorage.setItem('todo_device_key', key);
+          }
+        } catch (e) {}
+      }
+
+      if (key) {
+        const link = `${window.location.origin}/?key=${encodeURIComponent(key)}`;
+        try {
+          await navigator.clipboard.writeText(link);
+          if (typeof showToast === 'function') {
+            showToast('Auto-login link copied! Open on your phone once to login permanently.', 'success', 5500);
+          }
+        } catch (err) {
+          prompt('Copy this link to auto-login on any personal device:', link);
+        }
+      } else {
+        if (typeof showToast === 'function') {
+          showToast('Device key not found. Please log in again to generate one.', 'warning');
+        }
       }
     });
   }

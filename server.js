@@ -41,8 +41,17 @@ function verifyPassword(password, storedHash) {
   return crypto.timingSafeEqual(keyBuffer, derivedKey);
 }
 
+// Helper to verify device key
+function verifyDeviceKey(key) {
+  if (!key || typeof key !== 'string' || !authConfig.deviceKey) return false;
+  const keyBuf = Buffer.from(key.trim());
+  const storedBuf = Buffer.from(authConfig.deviceKey);
+  if (keyBuf.length !== storedBuf.length) return false;
+  return crypto.timingSafeEqual(keyBuf, storedBuf);
+}
+
 // Initialize Auth Config
-let authConfig = { passwordHash: null, initialized: false };
+let authConfig = { passwordHash: null, deviceKey: null, initialized: false };
 function loadAuthConfig() {
   if (fs.existsSync(CONFIG_FILE)) {
     try {
@@ -52,24 +61,41 @@ function loadAuthConfig() {
     }
   }
 
+  // Persistent Device Key (for permanent passwordless login on personal devices)
+  const envDeviceKey = process.env.DEVICE_KEY;
+  if (envDeviceKey) {
+    authConfig.deviceKey = envDeviceKey.trim();
+  } else if (!authConfig.deviceKey) {
+    authConfig.deviceKey = crypto.randomBytes(24).toString('hex');
+  }
+
   // Fallback or override from environment variable
   const envPassword = process.env.ADMIN_PASSWORD;
   if (envPassword) {
     const hash = hashPassword(envPassword);
-    authConfig = { passwordHash: hash, initialized: true };
+    // If ADMIN_PASSWORD in .env has changed, rotate device key to invalidate all existing device sessions
+    if (authConfig.passwordHash && !verifyPassword(envPassword, authConfig.passwordHash)) {
+      console.log('[Auth] ADMIN_PASSWORD changed in .env. Invalidating all existing device keys.');
+      authConfig.deviceKey = crypto.randomBytes(24).toString('hex');
+    }
+    authConfig.passwordHash = hash;
+    authConfig.initialized = true;
     fs.writeFileSync(CONFIG_FILE, JSON.stringify(authConfig, null, 2));
     console.log('[Auth] Password initialized from ADMIN_PASSWORD environment variable.');
   } else if (!authConfig.initialized) {
     // Generate a default secure password on first boot if neither file nor env exists
     const defaultPassword = crypto.randomBytes(6).toString('hex'); // 12-char friendly password
     const hash = hashPassword(defaultPassword);
-    authConfig = { passwordHash: hash, initialized: true };
+    authConfig.passwordHash = hash;
+    authConfig.initialized = true;
     fs.writeFileSync(CONFIG_FILE, JSON.stringify(authConfig, null, 2));
     console.log('====================================================');
     console.log('[SECURITY SETUP] First-time setup detected!');
     console.log(`Generated Default Password: ${defaultPassword}`);
     console.log('You can change this anytime or set ADMIN_PASSWORD in your .env');
     console.log('====================================================');
+  } else {
+    fs.writeFileSync(CONFIG_FILE, JSON.stringify(authConfig, null, 2));
   }
 }
 loadAuthConfig();
@@ -277,7 +303,20 @@ app.use((req, res, next) => {
 
 // Authentication Middleware
 function requireAuth(req, res, next) {
+  // 1. Check persistent device key (header, query, or token)
+  const deviceKey = req.headers['x-device-key'] || req.query.key;
+  if (deviceKey && verifyDeviceKey(deviceKey)) {
+    req.isDeviceAuthenticated = true;
+    return next();
+  }
+
   const token = req.cookies.auth_token || req.headers.authorization?.replace(/^Bearer\s+/i, '');
+  if (token && verifyDeviceKey(token)) {
+    req.isDeviceAuthenticated = true;
+    return next();
+  }
+
+  // 2. Check active session
   if (!token) {
     return res.status(401).json({ error: 'Unauthorized: Access token missing' });
   }
@@ -351,19 +390,19 @@ app.post('/api/auth/login', (req, res) => {
   const token = crypto.randomBytes(32).toString('hex');
   activeSessions.set(token, {
     createdAt: now,
-    expiresAt: now + SESSION_TTL_MS,
+    expiresAt: now + (1000 * 60 * 60 * 24 * 365 * 10), // 10 years persistent
     ip
   });
 
-  // Set cookie (httpOnly, sameSite lax, secure in production if https)
+  // Set long-lived cookie for personal browser
   res.cookie('auth_token', token, {
     httpOnly: true,
-    maxAge: SESSION_TTL_MS,
+    maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
     sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production' && req.secure
   });
 
-  return res.json({ success: true, token });
+  return res.json({ success: true, token, deviceKey: authConfig.deviceKey });
 });
 
 // Logout
@@ -376,17 +415,31 @@ app.post('/api/auth/logout', (req, res) => {
   res.json({ success: true });
 });
 
-// Check Session
+// Check Session & Device Key
 app.get('/api/auth/check', (req, res) => {
+  const deviceKey = req.headers['x-device-key'] || req.query.key;
+  if (deviceKey && verifyDeviceKey(deviceKey)) {
+    return res.json({ authenticated: true, deviceKey: authConfig.deviceKey });
+  }
+
   const token = req.cookies.auth_token || req.headers.authorization?.replace(/^Bearer\s+/i, '');
+  if (token && verifyDeviceKey(token)) {
+    return res.json({ authenticated: true, deviceKey: authConfig.deviceKey });
+  }
+
   if (token && activeSessions.has(token)) {
     const session = activeSessions.get(token);
     if (Date.now() <= session.expiresAt) {
-      return res.json({ authenticated: true });
+      return res.json({ authenticated: true, deviceKey: authConfig.deviceKey });
     }
     activeSessions.delete(token);
   }
   return res.json({ authenticated: false });
+});
+
+// Get Device Key (for creating auto-login links for other personal devices)
+app.get('/api/auth/device-key', requireAuth, (req, res) => {
+  res.json({ deviceKey: authConfig.deviceKey });
 });
 
 // Change Password
@@ -402,9 +455,14 @@ app.post('/api/auth/change-password', requireAuth, (req, res) => {
 
   const newHash = hashPassword(newPassword);
   authConfig.passwordHash = newHash;
+
+  // Invalidate all existing device keys & active sessions across all devices
+  authConfig.deviceKey = crypto.randomBytes(24).toString('hex');
+  activeSessions.clear();
   fs.writeFileSync(CONFIG_FILE, JSON.stringify(authConfig, null, 2));
 
-  res.json({ success: true, message: 'Password updated successfully' });
+  console.log('[Auth] Password changed. Device key rotated; all remembered devices invalidated.');
+  res.json({ success: true, message: 'Password updated. All remembered devices have been invalidated.' });
 });
 
 // --- Tasks CRUD Endpoints ---
