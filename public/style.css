@@ -166,18 +166,17 @@
 }
 
 /* Stat Cards Section */
-.metrics-section {
-  margin-bottom: var(--sp-6);
-}
-
+.metrics-section,
 .metrics-grid {
+  margin-bottom: var(--sp-6);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: var(--sp-5);
 }
 
-/* Kanban Columns Grid */
-.kanban-grid {
+/* Kanban Columns Grid (Horizontal 3-Column Layout) */
+.kanban-grid,
+.kanban-board-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--sp-6);
@@ -408,10 +407,12 @@
 
 /* Responsive adjustments */
 @media (max-width: 1024px) {
-  .metrics-grid {
+  .metrics-grid,
+  .metrics-section {
     grid-template-columns: repeat(2, 1fr);
   }
-  .kanban-grid {
+  .kanban-grid,
+  .kanban-board-container {
     grid-template-columns: 1fr;
   }
   .kanban-column {
@@ -431,7 +432,8 @@
   .topbar-controls {
     justify-content: flex-start;
   }
-  .metrics-grid {
+  .metrics-grid,
+  .metrics-section {
     grid-template-columns: 1fr;
   }
 }
