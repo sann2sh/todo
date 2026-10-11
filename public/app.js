@@ -759,17 +759,17 @@
       dueBadge = `<span class="task-due-date">📅 ${escapeHtml(task.due_date)}</span>`;
     }
 
-    // Mobile move buttons
+    // Move status shift buttons
     let shiftButtons = '';
     if (task.status === 'todo') {
-      shiftButtons = `<button class="btn-shift" data-target="in_progress" title="Move to In Progress">➔ In Progress</button>`;
+      shiftButtons = `<button class="btn-shift btn-shift-progress" data-target="in_progress" title="Move to In Progress"><span>In Progress</span> <span class="shift-arrow">→</span></button>`;
     } else if (task.status === 'in_progress') {
       shiftButtons = `
-        <button class="btn-shift" data-target="todo" title="Move to To Do">⬅ To Do</button>
-        <button class="btn-shift" data-target="done" title="Complete task">✓ Done</button>
+        <button class="btn-shift btn-shift-back" data-target="todo" title="Move back to To Do"><span class="shift-arrow">←</span> <span>To Do</span></button>
+        <button class="btn-shift btn-shift-done" data-target="done" title="Mark as Completed"><span class="shift-check">✓</span> <span>Done</span></button>
       `;
     } else if (task.status === 'done') {
-      shiftButtons = `<button class="btn-shift" data-target="in_progress" title="Move back to In Progress">⬅ Reopen</button>`;
+      shiftButtons = `<button class="btn-shift btn-shift-reopen" data-target="in_progress" title="Reopen task to In Progress"><span class="shift-arrow">↺</span> <span>Reopen</span></button>`;
     }
 
     card.innerHTML = `
