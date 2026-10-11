@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Personal Kanban Task Manager with CSV Persistent Storage.">
+  <meta name="description" content="Minimalist, High-Performance Multi-User Kanban Task Manager.">
   <title>Todo list</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +18,151 @@
 <body>
 
   <!-- ========================================== -->
-  <!-- MAIN APPLICATION SHELL                     -->
+  <!-- 1. LANDING PAGE VIEW (Unauthenticated)     -->
+  <!-- ========================================== -->
+  <div id="landing-view" class="landing-page-wrapper">
+    <!-- Landing Topbar -->
+    <header class="landing-header">
+      <div class="landing-header-inner container">
+        <div class="topbar-brand">
+          <div class="brand-icon-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <span class="topbar-brand-text">Todo list</span>
+        </div>
+
+        <div class="landing-header-actions">
+          <button id="landing-theme-toggle" class="btn btn-outline btn-sm" title="Toggle Light / Dark mode"
+            aria-label="Toggle Theme">
+            <span class="landing-theme-icon">🌙</span>
+          </button>
+          <button id="landing-login-btn" class="btn btn-outline btn-sm">
+            <span>Log In</span>
+          </button>
+          <button id="landing-signup-btn" class="btn btn-primary btn-sm">
+            <span>Get Started Free →</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <main class="landing-main">
+      <section class="hero-section container">
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+          <span>Lightweight • Multi-User • Zero-Password Auto-Login</span>
+        </div>
+
+        <h1 class="hero-title">
+          Minimalist Task Management<br>
+          <span class="hero-gradient-text">Built for Speed and Focus.</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          A distraction-free personal Kanban board with isolated private storage, permanent browser auto-login,
+          and instant local-first responsiveness.
+        </p>
+
+        <div class="hero-cta-group">
+          <button id="hero-signup-btn" class="btn btn-primary btn-lg">
+            <span>Create Your Free Board →</span>
+          </button>
+          <button id="hero-login-btn" class="btn btn-outline btn-lg">
+            <span>Sign In to Workspace</span>
+          </button>
+        </div>
+
+        <!-- Live Visual Preview Mockup -->
+        <div class="hero-preview-card">
+          <div class="preview-card-header">
+            <div class="preview-dots">
+              <span class="dot dot-red"></span>
+              <span class="dot dot-yellow"></span>
+              <span class="dot dot-green"></span>
+            </div>
+            <div class="preview-address-bar">todo.skisub.com/workspace</div>
+            <div class="preview-badge-status">⚡ 100% Isolated CSV</div>
+          </div>
+
+          <div class="preview-stats-row">
+            <div class="preview-stat-pill"><strong>4</strong> Total</div>
+            <div class="preview-stat-pill"><span style="color:var(--primary);">●</span> <strong>2</strong> To Do</div>
+            <div class="preview-stat-pill"><span style="color:#f59e0b;">●</span> <strong>1</strong> In Progress</div>
+            <div class="preview-stat-pill"><span style="color:#10b981;">●</span> <strong>1</strong> Done</div>
+          </div>
+
+          <div class="preview-columns-mock">
+            <div class="preview-col">
+              <div class="preview-col-head">📌 To Do (2)</div>
+              <div class="preview-item">
+                <span class="preview-item-title">Assemble new hardware kit</span>
+                <span class="preview-tag tag-high">🔥 High</span>
+              </div>
+              <div class="preview-item">
+                <span class="preview-item-title">Update LinkedIn profile</span>
+                <span class="preview-tag tag-med">⚡ Med</span>
+              </div>
+            </div>
+            <div class="preview-col">
+              <div class="preview-col-head">⏰ In Progress (1)</div>
+              <div class="preview-item">
+                <span class="preview-item-title">Review system migration</span>
+                <span class="preview-tag tag-high">🔥 High</span>
+              </div>
+            </div>
+            <div class="preview-col">
+              <div class="preview-col-head">✓ Done (1)</div>
+              <div class="preview-item done-preview">
+                <span class="preview-item-title">Configure HTTPS & Cloudflare</span>
+                <span class="preview-tag tag-low">🌿 Low</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Key Features Grid -->
+      <section class="features-section container">
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">🔑</div>
+            <h3>Zero-Password Auto-Login</h3>
+            <p>Log in once. A cryptographic device key is saved in your browser, granting instant access without typing passwords on your personal phone or laptop.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">📋</div>
+            <h3>Fluid 3-Stage Kanban</h3>
+            <p>Organize priorities with To Do, In Progress, and Completed columns. Supports full desktop drag-and-drop and mobile one-tap moves.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3>Complete Data Privacy</h3>
+            <p>Each user's tasks are stored in an isolated, private file. Zero tracking scripts, zero ads, and zero third-party databases.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Ultra-Lightweight Performance</h3>
+            <p>Engineered to run seamlessly with virtually zero server memory footprint and instant sub-10ms page responsiveness.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Landing Footer -->
+    <footer class="app-footer">
+      Todo list • Personal Workspace
+    </footer>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 2. MAIN APPLICATION SHELL (Authenticated)  -->
   <!-- ========================================== -->
   <div id="app-container" class="hidden">
 
@@ -32,7 +176,6 @@
           </svg>
         </div>
         <span class="topbar-brand-text">Todo list</span>
-
       </div>
 
       <div class="topbar-controls">
@@ -69,10 +212,15 @@
         <div class="account-menu-wrapper">
           <button id="account-btn" class="btn btn-outline" title="Account & Settings" aria-haspopup="true"
             aria-expanded="false">
-            <span>👤 Account</span>
+            <span>👤 <span id="account-username-label">Account</span></span>
             <span style="font-size:10px; margin-left:3px;">▾</span>
           </button>
           <div id="account-dropdown" class="account-dropdown hidden">
+            <div class="dropdown-user-info">
+              <span class="text-xs text-muted">Signed in as</span>
+              <strong id="dropdown-username" class="dropdown-username-text">@user</strong>
+            </div>
+            <div class="dropdown-divider"></div>
             <button id="copy-autologin-btn" class="dropdown-item" title="Copy auto-login link for your other devices">
               <span>🔗 Copy Auto-Login Link</span>
             </button>
@@ -98,52 +246,56 @@
 
       <!-- Dashboard Stat Cards Overview -->
       <section class="metrics-section">
-        <div class="metrics-grid">
-
-          <div class="stat-card animate-in">
-            <div class="stat-icon primary">📋</div>
-            <div>
-              <div class="stat-value" id="stat-total-count">0</div>
-              <div class="stat-label">Total Tasks</div>
-            </div>
+        <div class="stat-card">
+          <div class="stat-icon-wrapper" style="background:var(--primary-subtle); color:var(--primary);">
+            📊
           </div>
-
-          <div class="stat-card animate-in" style="animation-delay: 0.05s;">
-            <div class="stat-icon info">📌</div>
-            <div>
-              <div class="stat-value" id="stat-todo-count">0</div>
-              <div class="stat-label">To Do</div>
-            </div>
+          <div class="stat-content">
+            <span class="stat-label">Total Tasks</span>
+            <div class="stat-value" id="stat-total-count">0</div>
           </div>
+        </div>
 
-          <div class="stat-card animate-in" style="animation-delay: 0.1s;">
-            <div class="stat-icon warning">⏰</div>
-            <div>
-              <div class="stat-value" id="stat-prog-count">0</div>
-              <div class="stat-label">In Progress</div>
-            </div>
+        <div class="stat-card">
+          <div class="stat-icon-wrapper" style="background:#EEF2FF; color:#4F46E5;">
+            📌
           </div>
-
-          <div class="stat-card animate-in" style="animation-delay: 0.15s;">
-            <div class="stat-icon success">✓</div>
-            <div>
-              <div class="stat-value" id="stat-done-count">0</div>
-              <div class="stat-label">Completed</div>
-            </div>
+          <div class="stat-content">
+            <span class="stat-label">To Do</span>
+            <div class="stat-value" id="stat-todo-count">0</div>
           </div>
+        </div>
 
+        <div class="stat-card">
+          <div class="stat-icon-wrapper" style="background:#FFFBEB; color:#D97706;">
+            ⏰
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">In Progress</span>
+            <div class="stat-value" id="stat-prog-count">0</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrapper" style="background:#ECFDF5; color:#059669;">
+            ✓
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Completed</span>
+            <div class="stat-value" id="stat-done-count">0</div>
+          </div>
         </div>
       </section>
 
-      <!-- Kanban Columns Board -->
-      <section class="kanban-grid">
+      <!-- 3-Column Kanban Board Layout -->
+      <section class="kanban-board-container" id="kanban-board">
 
         <!-- COLUMN 1: TO DO -->
         <div class="kanban-column" id="column-todo" data-status="todo">
           <div class="kanban-column-header">
             <div class="kanban-column-title">
               <span>📌 To Do</span>
-              <span class="badge badge-pending" id="count-todo">0</span>
+              <span class="badge badge-inactive" id="count-todo">0</span>
             </div>
             <button class="btn btn-outline btn-sm column-quick-add" data-status="todo" title="Quick add task">➕</button>
           </div>
@@ -187,49 +339,81 @@
 
     <!-- Footer Pinned at Bottom of Screen -->
     <footer class="app-footer">
-      Todo list
+      Todo list • Personal Workspace
     </footer>
   </div>
 
   <!-- ========================================== -->
-  <!-- LOGIN SCREEN                               -->
+  <!-- 3. AUTH MODAL (Login / Sign Up)            -->
   <!-- ========================================== -->
-  <div id="login-overlay" class="login-screen">
-    <div class="login-card animate-in">
-      <div class="login-icon-box">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-          stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-        </svg>
+  <div id="auth-modal" class="modal-overlay">
+    <div class="modal auth-modal-card">
+      <div class="modal-header">
+        <!-- Auth Tabs (Log In / Sign Up) -->
+        <div class="auth-tabs">
+          <button type="button" id="tab-login-btn" class="auth-tab active">Log In</button>
+          <button type="button" id="tab-signup-btn" class="auth-tab">Sign Up</button>
+        </div>
+        <button class="modal-close" id="auth-close-btn" aria-label="Close modal">&times;</button>
       </div>
-      <h1>Personal Workspace</h1>
-      <p>Enter your password to unlock the Kanban board</p>
 
-      <form id="login-form" novalidate>
-        <div class="form-group" style="text-align:left; margin-bottom:var(--sp-4);">
-          <label class="form-label" for="login-password">Access Password <span class="required">*</span></label>
-          <div style="position:relative; display:flex; align-items:center;">
-            <input type="password" id="login-password" class="form-input" placeholder="Enter password..." required
-              autofocus autocomplete="current-password">
-            <button type="button" id="toggle-login-pw"
-              style="position:absolute; right:10px; background:none; border:none; cursor:pointer; color:var(--gray-400); font-size:16px;">👁️</button>
+      <div class="modal-body">
+        <div class="auth-heading-area">
+          <h2 id="auth-modal-title" style="font-size:var(--text-xl); font-weight:700; margin-bottom:var(--sp-1);">Sign In to Workspace</h2>
+          <p id="auth-modal-subtitle" class="text-sm text-muted">Enter your credentials to access your Kanban board.</p>
+        </div>
+
+        <form id="auth-form" novalidate style="margin-top:var(--sp-4);">
+          <!-- Username Field -->
+          <div class="form-group" style="text-align:left; margin-bottom:var(--sp-3);">
+            <label class="form-label" for="auth-username">Username <span class="required">*</span></label>
+            <input type="text" id="auth-username" class="form-input" placeholder="e.g. san" required
+              autocomplete="username" maxlength="20" autofocus>
           </div>
-        </div>
 
-        <div id="login-error" class="hidden"
-          style="background:var(--danger-light); color:#991B1B; padding:var(--sp-3); border-radius:var(--radius); font-size:var(--text-xs); margin-bottom:var(--sp-4); text-align:left;">
-        </div>
+          <!-- Password Field -->
+          <div class="form-group" style="text-align:left; margin-bottom:var(--sp-3);">
+            <label class="form-label" for="auth-password">Password <span class="required">*</span></label>
+            <div style="position:relative; display:flex; align-items:center;">
+              <input type="password" id="auth-password" class="form-input" placeholder="Enter password..." required
+                autocomplete="current-password">
+              <button type="button" id="toggle-auth-pw"
+                style="position:absolute; right:10px; background:none; border:none; cursor:pointer; color:var(--gray-400); font-size:16px;">👁️</button>
+            </div>
+          </div>
 
-        <button type="submit" id="login-submit-btn" class="btn btn-primary w-full" style="padding:12px;">
-          <span>Unlock Board →</span>
-        </button>
-      </form>
+          <!-- Confirm Password (Only shown on Sign Up tab) -->
+          <div id="auth-confirm-group" class="form-group hidden" style="text-align:left; margin-bottom:var(--sp-3);">
+            <label class="form-label" for="auth-confirm-password">Confirm Password <span class="required">*</span></label>
+            <input type="password" id="auth-confirm-password" class="form-input" placeholder="Repeat your password..."
+              autocomplete="new-password">
+          </div>
+
+          <!-- Error Alert Banner -->
+          <div id="auth-error" class="hidden"
+            style="background:var(--danger-light); color:#991B1B; padding:var(--sp-3); border-radius:var(--radius); font-size:var(--text-xs); margin-bottom:var(--sp-3); text-align:left;">
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" id="auth-submit-btn" class="btn btn-primary w-full" style="padding:12px; font-weight:600;">
+            <span id="auth-submit-text">Log In →</span>
+          </button>
+
+          <!-- Toggle Link at Bottom -->
+          <p class="text-xs text-muted text-center" style="margin-top:var(--sp-4);">
+            <span id="auth-toggle-prompt">Don't have an account?</span>
+            <button type="button" id="auth-toggle-btn"
+              style="background:none; border:none; color:var(--primary); font-weight:600; cursor:pointer; text-decoration:underline; font-size:inherit; padding:0; margin-left:4px;">
+              Create one here
+            </button>
+          </p>
+        </form>
+      </div>
     </div>
   </div>
 
   <!-- ========================================== -->
-  <!-- ADD / EDIT TASK MODAL                      -->
+  <!-- 4. ADD / EDIT TASK MODAL                   -->
   <!-- ========================================== -->
   <div class="modal-overlay" id="task-modal">
     <div class="modal">
@@ -289,7 +473,7 @@
   </div>
 
   <!-- ========================================== -->
-  <!-- Change Password / PASSWORD MODAL         -->
+  <!-- 5. CHANGE PASSWORD MODAL                   -->
   <!-- ========================================== -->
   <div class="modal-overlay" id="settings-modal">
     <div class="modal">
@@ -300,7 +484,7 @@
 
       <form id="password-form" novalidate>
         <div class="modal-body" style="display:flex; flex-direction:column; gap:var(--sp-4);">
-          <p class="text-sm text-muted">Update your master access password. Changes apply immediately to all sessions.
+          <p class="text-sm text-muted">Update your password. This will automatically rotate your device key and invalidate all other logged-in sessions.
           </p>
 
           <div class="form-group">
@@ -311,14 +495,14 @@
 
           <div class="form-group">
             <label class="form-label" for="new-password">New Password <span class="required">*</span></label>
-            <input type="password" id="new-password" class="form-input" required minlength="4"
-              placeholder="Minimum 4 characters">
+            <input type="password" id="new-password" class="form-input" required minlength="6"
+              placeholder="Minimum 6 characters">
           </div>
 
           <div class="form-group">
             <label class="form-label" for="confirm-password">Confirm New Password <span
                 class="required">*</span></label>
-            <input type="password" id="confirm-password" class="form-input" required minlength="4"
+            <input type="password" id="confirm-password" class="form-input" required minlength="6"
               placeholder="Repeat new password">
           </div>
 

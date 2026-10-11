@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════
-// SSMS FLOW KANBAN — CLIENT APP LOGIC
+// FLOW KANBAN — MULTI-USER CLIENT APP LOGIC
 // ═══════════════════════════════════════════════════════════
 
 (function() {
@@ -11,17 +11,43 @@
     searchQuery: '',
     priorityFilter: 'all',
     isAuthenticated: false,
+    currentUser: null, // { id: string, username: string }
+    authMode: 'login', // 'login' | 'signup'
     draggedTaskId: null,
   };
 
   // DOM Cache
   const elements = {
     appContainer: document.getElementById('app-container'),
-    loginOverlay: document.getElementById('login-overlay'),
-    loginForm: document.getElementById('login-form'),
-    loginPassword: document.getElementById('login-password'),
-    loginError: document.getElementById('login-error'),
-    toggleLoginPw: document.getElementById('toggle-login-pw'),
+    landingView: document.getElementById('landing-view'),
+
+    // Landing Page Elements
+    landingHeader: document.querySelector('.landing-header'),
+    landingThemeToggle: document.getElementById('landing-theme-toggle'),
+    landingThemeIcon: document.querySelector('.landing-theme-icon'),
+    landingLoginBtn: document.getElementById('landing-login-btn'),
+    landingSignupBtn: document.getElementById('landing-signup-btn'),
+    heroSignupBtn: document.getElementById('hero-signup-btn'),
+    heroLoginBtn: document.getElementById('hero-login-btn'),
+
+    // Auth Modal
+    authModal: document.getElementById('auth-modal'),
+    authCloseBtn: document.getElementById('auth-close-btn'),
+    tabLoginBtn: document.getElementById('tab-login-btn'),
+    tabSignupBtn: document.getElementById('tab-signup-btn'),
+    authModalTitle: document.getElementById('auth-modal-title'),
+    authModalSubtitle: document.getElementById('auth-modal-subtitle'),
+    authForm: document.getElementById('auth-form'),
+    authUsername: document.getElementById('auth-username'),
+    authPassword: document.getElementById('auth-password'),
+    authConfirmGroup: document.getElementById('auth-confirm-group'),
+    authConfirmPassword: document.getElementById('auth-confirm-password'),
+    toggleAuthPw: document.getElementById('toggle-auth-pw'),
+    authError: document.getElementById('auth-error'),
+    authSubmitBtn: document.getElementById('auth-submit-btn'),
+    authSubmitText: document.getElementById('auth-submit-text'),
+    authTogglePrompt: document.getElementById('auth-toggle-prompt'),
+    authToggleBtn: document.getElementById('auth-toggle-btn'),
 
     // Modals
     taskModal: document.getElementById('task-modal'),
@@ -49,7 +75,9 @@
     // Topbar Controls
     newTaskBtn: document.getElementById('new-task-btn'),
     accountBtn: document.getElementById('account-btn'),
+    accountUsernameLabel: document.getElementById('account-username-label'),
     accountDropdown: document.getElementById('account-dropdown'),
+    dropdownUsername: document.getElementById('dropdown-username'),
     copyAutologinBtn: document.getElementById('copy-autologin-btn'),
     logoutBtn: document.getElementById('logout-btn'),
     themeToggleBtn: document.getElementById('theme-toggle-btn'),
@@ -109,7 +137,7 @@
     });
 
     if (res.status === 401) {
-      showLogin();
+      showLanding();
       throw new Error('Unauthorized');
     }
 
@@ -129,20 +157,184 @@
   function setTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('task_kanban_theme', theme);
-    if (elements.themeIcon) {
-      elements.themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+    const icon = theme === 'dark' ? '☀️' : '🌙';
+    if (elements.themeIcon) elements.themeIcon.textContent = icon;
+    if (elements.landingThemeIcon) elements.landingThemeIcon.textContent = icon;
+  }
+
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    const nextTheme = current === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+  }
+
+  if (elements.themeToggleBtn) elements.themeToggleBtn.addEventListener('click', toggleTheme);
+  if (elements.landingThemeToggle) elements.landingThemeToggle.addEventListener('click', toggleTheme);
+
+  // --- Auth View & Modal Logic ---
+
+  function showLanding() {
+    state.isAuthenticated = false;
+    state.currentUser = null;
+    elements.appContainer.classList.add('hidden');
+    elements.landingView.classList.remove('hidden');
+    closeAuthModal();
+  }
+
+  function setAuthenticated(user) {
+    state.isAuthenticated = true;
+    state.currentUser = user;
+    if (user && user.username) {
+      if (elements.accountUsernameLabel) elements.accountUsernameLabel.textContent = `@${user.username}`;
+      if (elements.dropdownUsername) elements.dropdownUsername.textContent = `@${user.username}`;
+    }
+    elements.landingView.classList.add('hidden');
+    elements.appContainer.classList.remove('hidden');
+    closeAuthModal();
+  }
+
+  function setAuthMode(mode) {
+    state.authMode = mode;
+    elements.authError.classList.add('hidden');
+    elements.authError.textContent = '';
+
+    if (mode === 'signup') {
+      elements.tabSignupBtn.classList.add('active');
+      elements.tabLoginBtn.classList.remove('active');
+      elements.authModalTitle.textContent = 'Create Your Free Board';
+      elements.authModalSubtitle.textContent = 'Choose a username and password to start organizing tasks.';
+      elements.authConfirmGroup.classList.remove('hidden');
+      elements.authConfirmPassword.setAttribute('required', 'required');
+      elements.authSubmitText.textContent = 'Create My Board →';
+      elements.authTogglePrompt.textContent = 'Already have an account?';
+      elements.authToggleBtn.textContent = 'Sign in here';
+    } else {
+      elements.tabLoginBtn.classList.add('active');
+      elements.tabSignupBtn.classList.remove('active');
+      elements.authModalTitle.textContent = 'Sign In to Workspace';
+      elements.authModalSubtitle.textContent = 'Enter your credentials to access your Kanban board.';
+      elements.authConfirmGroup.classList.add('hidden');
+      elements.authConfirmPassword.removeAttribute('required');
+      elements.authConfirmPassword.value = '';
+      elements.authSubmitText.textContent = 'Log In →';
+      elements.authTogglePrompt.textContent = "Don't have an account?";
+      elements.authToggleBtn.textContent = 'Create one here';
     }
   }
 
-  if (elements.themeToggleBtn) {
-    elements.themeToggleBtn.addEventListener('click', () => {
-      const current = document.documentElement.getAttribute('data-theme') || 'light';
-      const nextTheme = current === 'dark' ? 'light' : 'dark';
-      setTheme(nextTheme);
+  function openAuthModal(mode = 'login') {
+    setAuthMode(mode);
+    elements.authUsername.value = '';
+    elements.authPassword.value = '';
+    elements.authConfirmPassword.value = '';
+    elements.authModal.classList.add('active');
+    elements.authUsername.focus();
+  }
+
+  function closeAuthModal() {
+    elements.authModal.classList.remove('active');
+  }
+
+  // Landing Page Buttons
+  if (elements.landingLoginBtn) elements.landingLoginBtn.addEventListener('click', () => openAuthModal('login'));
+  if (elements.landingSignupBtn) elements.landingSignupBtn.addEventListener('click', () => openAuthModal('signup'));
+  if (elements.heroLoginBtn) elements.heroLoginBtn.addEventListener('click', () => openAuthModal('login'));
+  if (elements.heroSignupBtn) elements.heroSignupBtn.addEventListener('click', () => openAuthModal('signup'));
+
+  // Auth Modal Controls
+  if (elements.tabLoginBtn) elements.tabLoginBtn.addEventListener('click', () => setAuthMode('login'));
+  if (elements.tabSignupBtn) elements.tabSignupBtn.addEventListener('click', () => setAuthMode('signup'));
+  if (elements.authToggleBtn) elements.authToggleBtn.addEventListener('click', () => setAuthMode(state.authMode === 'login' ? 'signup' : 'login'));
+  if (elements.authCloseBtn) elements.authCloseBtn.addEventListener('click', closeAuthModal);
+
+  // Password visibility toggle in Auth modal
+  if (elements.toggleAuthPw) {
+    elements.toggleAuthPw.addEventListener('click', () => {
+      const isPw = elements.authPassword.type === 'password';
+      elements.authPassword.type = isPw ? 'text' : 'password';
+      elements.toggleAuthPw.textContent = isPw ? '🔒' : '👁️';
     });
   }
 
-  // --- Auth Flow ---
+  // Auth Form Submit (Login or Sign Up)
+  elements.authForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = elements.authUsername.value.trim();
+    const password = elements.authPassword.value;
+    const confirmPassword = elements.authConfirmPassword.value;
+
+    elements.authError.classList.add('hidden');
+    elements.authError.textContent = '';
+
+    if (!username) {
+      elements.authError.textContent = 'Please enter a username.';
+      elements.authError.classList.remove('hidden');
+      elements.authUsername.focus();
+      return;
+    }
+
+    if (!password) {
+      elements.authError.textContent = 'Please enter a password.';
+      elements.authError.classList.remove('hidden');
+      elements.authPassword.focus();
+      return;
+    }
+
+    if (state.authMode === 'signup') {
+      if (password.length < 6) {
+        elements.authError.textContent = 'Password must be at least 6 characters long.';
+        elements.authError.classList.remove('hidden');
+        elements.authPassword.focus();
+        return;
+      }
+      if (password !== confirmPassword) {
+        elements.authError.textContent = 'Passwords do not match.';
+        elements.authError.classList.remove('hidden');
+        elements.authConfirmPassword.focus();
+        return;
+      }
+    }
+
+    const endpoint = state.authMode === 'signup' ? '/api/auth/signup' : '/api/auth/login';
+
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        elements.authError.textContent = data.error || 'Authentication failed';
+        elements.authError.classList.remove('hidden');
+        elements.authModal.querySelector('.auth-modal-card').classList.add('shake');
+        setTimeout(() => {
+          elements.authModal.querySelector('.auth-modal-card').classList.remove('shake');
+        }, 400);
+        return;
+      }
+
+      // Store personal deviceKey for permanent auto-login
+      if (data.deviceKey) {
+        localStorage.setItem('todo_device_key', data.deviceKey);
+      }
+
+      setAuthenticated(data.user);
+      if (typeof showToast === 'function') {
+        const msg = state.authMode === 'signup'
+          ? `Welcome to Flow Kanban, @${data.user.username}! Your board is ready.`
+          : `Device authorized! Welcome back, @${data.user.username}!`;
+        showToast(msg, 'success');
+      }
+      loadTasks();
+    } catch (err) {
+      elements.authError.textContent = err.message || 'Network error';
+      elements.authError.classList.remove('hidden');
+    }
+  });
+
+  // Check Auth & Auto-Login on Initial Load
   async function checkAuth() {
     const deviceKey = localStorage.getItem('todo_device_key') || '';
     try {
@@ -152,90 +344,77 @@
         }
       });
       const data = await res.json();
-      if (data.authenticated) {
+      if (data.authenticated && data.user) {
         if (data.deviceKey) {
           localStorage.setItem('todo_device_key', data.deviceKey);
         }
-        setAuthenticated(true);
+        setAuthenticated(data.user);
         loadTasks();
       } else {
-        showLogin();
+        showLanding();
       }
     } catch (err) {
-      showLogin();
+      showLanding();
     }
   }
 
-  function showLogin() {
-    state.isAuthenticated = false;
-    elements.appContainer.classList.add('hidden');
-    elements.loginOverlay.classList.remove('hidden');
-    elements.loginPassword.value = '';
-    elements.loginPassword.focus();
-  }
+  // Account Dropdown Toggle
+  elements.accountBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isHidden = elements.accountDropdown.classList.contains('hidden');
+    elements.accountDropdown.classList.toggle('hidden', !isHidden);
+    elements.accountBtn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+  });
 
-  function setAuthenticated(isAuth) {
-    state.isAuthenticated = isAuth;
-    if (isAuth) {
-      elements.loginOverlay.classList.add('hidden');
-      elements.appContainer.classList.remove('hidden');
-    } else {
-      showLogin();
-    }
-  }
-
-  // Login Submit
-  elements.loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const password = elements.loginPassword.value;
-    elements.loginError.classList.add('hidden');
-    elements.loginError.textContent = '';
-
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        elements.loginError.textContent = data.error || 'Login failed';
-        elements.loginError.classList.remove('hidden');
-        elements.loginOverlay.querySelector('.login-card').classList.add('shake');
-        setTimeout(() => {
-          elements.loginOverlay.querySelector('.login-card').classList.remove('shake');
-        }, 400);
-        return;
-      }
-
-      if (data.deviceKey) {
-        localStorage.setItem('todo_device_key', data.deviceKey);
-      }
-
-      setAuthenticated(true);
-      if (typeof showToast === 'function') {
-        showToast('Device authorized! Auto-login is now active.', 'success');
-      }
-      loadTasks();
-    } catch (err) {
-      elements.loginError.textContent = err.message || 'Network error';
-      elements.loginError.classList.remove('hidden');
+  document.addEventListener('click', (e) => {
+    if (!elements.accountMenuWrapper) return;
+    if (!elements.accountMenuWrapper.contains(e.target)) {
+      elements.accountDropdown.classList.add('hidden');
+      elements.accountBtn.setAttribute('aria-expanded', 'false');
     }
   });
 
-  // Password visibility toggle
-  elements.toggleLoginPw.addEventListener('click', () => {
-    const isPw = elements.loginPassword.type === 'password';
-    elements.loginPassword.type = isPw ? 'text' : 'password';
-    elements.toggleLoginPw.textContent = isPw ? '🔒' : '👁️';
-  });
+  elements.accountMenuWrapper = document.querySelector('.account-menu-wrapper');
+
+  // Copy Auto-Login Link for Other Personal Devices
+  if (elements.copyAutologinBtn) {
+    elements.copyAutologinBtn.addEventListener('click', async () => {
+      if (elements.accountDropdown) elements.accountDropdown.classList.add('hidden');
+      let key = localStorage.getItem('todo_device_key');
+      if (!key) {
+        try {
+          const res = await api('/api/auth/device-key');
+          if (res.deviceKey) {
+            key = res.deviceKey;
+            localStorage.setItem('todo_device_key', key);
+          }
+        } catch (e) {}
+      }
+
+      if (key) {
+        const link = `${window.location.origin}/?key=${encodeURIComponent(key)}`;
+        try {
+          await navigator.clipboard.writeText(link);
+          if (typeof showToast === 'function') {
+            showToast(`Auto-login link copied for @${state.currentUser?.username || 'user'}! Open once on your phone to login permanently.`, 'success', 5500);
+          }
+        } catch (err) {
+          prompt('Copy this link to auto-login on any personal device:', link);
+        }
+      } else {
+        if (typeof showToast === 'function') {
+          showToast('Device key not found. Please log in again to generate one.', 'warning');
+        }
+      }
+    });
+  }
 
   // Logout
   elements.logoutBtn.addEventListener('click', () => {
     if (elements.accountDropdown) elements.accountDropdown.classList.add('hidden');
+    const username = state.currentUser?.username || 'your';
     confirmAction(
-      'Are you sure you want to log out of your workspace? (This will remove auto-login from this browser)',
+      `Are you sure you want to log out of @${username}'s workspace? (This will remove auto-login from this browser)`,
       async () => {
         try {
           localStorage.removeItem('todo_device_key');
@@ -243,9 +422,9 @@
           if (typeof showToast === 'function') {
             showToast('Logged out securely.', 'info');
           }
-          showLogin();
+          showLanding();
         } catch (err) {
-          showLogin();
+          showLanding();
         }
       },
       'Log Out',
@@ -280,6 +459,12 @@
 
     elements.passwordError.classList.add('hidden');
 
+    if (newPassword.length < 6) {
+      elements.passwordError.textContent = 'New password must be at least 6 characters long.';
+      elements.passwordError.classList.remove('hidden');
+      return;
+    }
+
     if (newPassword !== confirmPassword) {
       elements.passwordError.textContent = 'New passwords do not match.';
       elements.passwordError.classList.remove('hidden');
@@ -292,12 +477,13 @@
         body: JSON.stringify({ currentPassword, newPassword })
       });
 
-      // Clear local device key so current device also re-authenticates with new password
+      // Clear local device key so current device re-authenticates with new password
       localStorage.removeItem('todo_device_key');
       elements.settingsModal.classList.remove('active');
-      showLogin();
+      showLanding();
+      openAuthModal('login');
       if (typeof showToast === 'function') {
-        showToast('Password changed! All devices have been logged out. Please log in with your new password.', 'info');
+        showToast('Password changed! All devices have been logged out. Please sign in with your new password.', 'info', 6000);
       }
     } catch (err) {
       elements.passwordError.textContent = err.message;
@@ -306,10 +492,15 @@
   });
 
   // --- Tasks CRUD ---
+
   async function loadTasks() {
     try {
       const data = await api('/api/tasks');
       state.tasks = data.tasks || [];
+      if (data.username && elements.accountUsernameLabel) {
+        elements.accountUsernameLabel.textContent = `@${data.username}`;
+        elements.dropdownUsername.textContent = `@${data.username}`;
+      }
       renderBoard();
     } catch (err) {
       if (err.message !== 'Unauthorized' && typeof showToast === 'function') {
@@ -451,53 +642,6 @@
     return status;
   }
 
-  // Account Dropdown Toggle
-  if (elements.accountBtn && elements.accountDropdown) {
-    elements.accountBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      elements.accountDropdown.classList.toggle('hidden');
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!elements.accountDropdown.contains(e.target) && e.target !== elements.accountBtn) {
-        elements.accountDropdown.classList.add('hidden');
-      }
-    });
-  }
-
-  // Copy Auto-Login Link (for one-click permanent login on mobile or other personal devices)
-  if (elements.copyAutologinBtn) {
-    elements.copyAutologinBtn.addEventListener('click', async () => {
-      if (elements.accountDropdown) elements.accountDropdown.classList.add('hidden');
-      let key = localStorage.getItem('todo_device_key');
-      if (!key) {
-        try {
-          const res = await api('/api/auth/device-key');
-          if (res.deviceKey) {
-            key = res.deviceKey;
-            localStorage.setItem('todo_device_key', key);
-          }
-        } catch (e) {}
-      }
-
-      if (key) {
-        const link = `${window.location.origin}/?key=${encodeURIComponent(key)}`;
-        try {
-          await navigator.clipboard.writeText(link);
-          if (typeof showToast === 'function') {
-            showToast('Auto-login link copied! Open on your phone once to login permanently.', 'success', 5500);
-          }
-        } catch (err) {
-          prompt('Copy this link to auto-login on any personal device:', link);
-        }
-      } else {
-        if (typeof showToast === 'function') {
-          showToast('Device key not found. Please log in again to generate one.', 'warning');
-        }
-      }
-    });
-  }
-
   // Search & Filter
   elements.searchInput.addEventListener('input', (e) => {
     state.searchQuery = e.target.value.toLowerCase().trim();
@@ -599,53 +743,52 @@
     card.setAttribute('draggable', 'true');
     card.setAttribute('data-id', task.id);
 
-    // Priority badge (using SSMS badge classes from test-design.html)
+    // Priority badge helper
     let priorityBadge = '';
     if (task.priority === 'high') {
-      priorityBadge = `<span class="badge badge-expired">● High</span>`;
-    } else if (task.priority === 'low') {
-      priorityBadge = `<span class="badge badge-active">● Low</span>`;
+      priorityBadge = `<span class="task-badge badge-high">🔥 High</span>`;
+    } else if (task.priority === 'medium') {
+      priorityBadge = `<span class="task-badge badge-medium">⚡ Med</span>`;
     } else {
-      priorityBadge = `<span class="badge badge-expiring">● Medium</span>`;
+      priorityBadge = `<span class="task-badge badge-low">🌿 Low</span>`;
     }
 
-    // Due date
-    let dueDateHtml = '';
+    // Due date badge
+    let dueBadge = '';
     if (task.due_date) {
-      const today = new Date().toISOString().split('T')[0];
-      const isOverdue = task.due_date < today && task.status !== 'done';
-      dueDateHtml = `
-        <span class="due-pill ${isOverdue ? 'overdue' : ''}">
-          📅 ${isOverdue ? 'Overdue: ' : ''}${escapeHtml(task.due_date)}
-        </span>
-      `;
+      dueBadge = `<span class="task-due-date">📅 ${escapeHtml(task.due_date)}</span>`;
     }
 
-    // Move buttons
-    let shiftButtonsHtml = '<div class="move-btns">';
-    if (task.status === 'in_progress') {
-      shiftButtonsHtml += `<button class="btn btn-outline btn-sm btn-shift" data-target="todo" title="Move to To Do">← To Do</button>`;
-      shiftButtonsHtml += `<button class="btn btn-outline btn-sm btn-shift" data-target="done" title="Move to Done">Done →</button>`;
-    } else if (task.status === 'todo') {
-      shiftButtonsHtml += `<button class="btn btn-outline btn-sm btn-shift" data-target="in_progress" title="Move to In Progress">In Prog →</button>`;
+    // Mobile move buttons
+    let shiftButtons = '';
+    if (task.status === 'todo') {
+      shiftButtons = `<button class="btn-shift" data-target="in_progress" title="Move to In Progress">➔ In Progress</button>`;
+    } else if (task.status === 'in_progress') {
+      shiftButtons = `
+        <button class="btn-shift" data-target="todo" title="Move to To Do">⬅ To Do</button>
+        <button class="btn-shift" data-target="done" title="Complete task">✓ Done</button>
+      `;
     } else if (task.status === 'done') {
-      shiftButtonsHtml += `<button class="btn btn-outline btn-sm btn-shift" data-target="in_progress" title="Move back to In Progress">← In Prog</button>`;
+      shiftButtons = `<button class="btn-shift" data-target="in_progress" title="Move back to In Progress">⬅ Reopen</button>`;
     }
-    shiftButtonsHtml += '</div>';
 
     card.innerHTML = `
       <div class="task-card-header">
-        ${priorityBadge}
-        <div class="card-action-btns">
-          <button class="btn btn-ghost btn-sm card-btn-edit" title="Edit Task">✏️</button>
-          <button class="btn btn-ghost btn-sm card-btn-delete" title="Delete Task" style="color:var(--danger);">🗑️</button>
+        <h4 class="task-card-title">${escapeHtml(task.title)}</h4>
+        <div class="task-card-actions">
+          <button class="card-btn card-btn-edit" title="Edit task">✏️</button>
+          <button class="card-btn card-btn-delete" title="Delete task">🗑️</button>
         </div>
       </div>
-      <div class="task-card-title">${escapeHtml(task.title)}</div>
-      ${task.description ? `<div class="task-card-desc">${escapeHtml(task.description)}</div>` : ''}
+      ${task.description ? `<p class="task-card-desc">${escapeHtml(task.description)}</p>` : ''}
       <div class="task-card-footer">
-        ${dueDateHtml || '<span></span>'}
-        ${shiftButtonsHtml}
+        <div class="task-card-meta">
+          ${priorityBadge}
+          ${dueBadge}
+        </div>
+        <div class="task-card-shift-actions">
+          ${shiftButtons}
+        </div>
       </div>
     `;
 
@@ -722,6 +865,7 @@
     const isInput = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
 
     if (e.key === 'Escape') {
+      if (elements.authModal.classList.contains('active')) closeAuthModal();
       if (elements.taskModal.classList.contains('active')) closeTaskModal();
       if (elements.settingsModal.classList.contains('active')) elements.settingsModal.classList.remove('active');
     }
