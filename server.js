@@ -758,11 +758,20 @@ app.get('/api/tasks/export', requireAuth, (req, res) => {
   res.sendFile(csvFile);
 });
 
-// Serve frontend assets
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve frontend assets with no-cache to prevent stale browser caching mismatches
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: 0,
+  etag: true,
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.html') || filePath.endsWith('.js') || filePath.endsWith('.css')) {
+      res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+    }
+  }
+}));
 
 // Catch-all for SPA/UI
 app.use((req, res) => {
+  res.setHeader('Cache-Control', 'no-cache, must-revalidate');
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
