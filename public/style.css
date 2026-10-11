@@ -27,6 +27,25 @@
   background: var(--white);
 }
 
+.credit-link {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.credit-link:hover {
+  text-decoration: underline;
+}
+
+[data-theme="dark"] .credit-link {
+  color: #818cf8;
+}
+
+[data-theme="dark"] .credit-link:hover {
+  color: #a5b4fc;
+}
+
 /* Topbar Branding & Controls */
 .topbar {
   background: var(--white);
