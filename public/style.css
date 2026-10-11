@@ -8,7 +8,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: var(--gray-50);
+  background: #f1f5f9;
 }
 
 .main-content-wrapper {
@@ -184,24 +184,39 @@
 }
 
 .kanban-column {
-  background: var(--white);
-  border: 1px solid var(--gray-200);
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   max-height: calc(100vh - 270px);
   min-height: 480px;
   overflow: hidden;
+  transition: all var(--transition);
 }
 
 .kanban-column-header {
   padding: var(--sp-4) var(--sp-5);
-  border-bottom: 1px solid var(--gray-200);
-  background: var(--gray-50);
+  border-bottom: 1px solid #e2e8f0;
+  border-top: 3px solid transparent;
+  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  transition: all var(--transition);
+}
+
+#column-todo .kanban-column-header {
+  border-top-color: #6366f1;
+}
+
+#column-in-progress .kanban-column-header {
+  border-top-color: #f59e0b;
+}
+
+#column-done .kanban-column-header {
+  border-top-color: #10b981;
 }
 
 .kanban-column-title {
@@ -213,8 +228,64 @@
   color: var(--gray-900);
 }
 
+/* Column Header Status Count Badges */
+#count-todo {
+  background: #eff6ff;
+  color: #4338ca;
+  border: 1px solid #c7d2fe;
+}
+
+#count-in_progress {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+#count-done {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+/* Column Quick Add Button */
+.column-quick-add {
+  appearance: none;
+  -webkit-appearance: none;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #64748b;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.column-quick-add svg {
+  display: block;
+  pointer-events: none;
+}
+
+.column-quick-add:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #0f172a;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.column-quick-add:active {
+  transform: scale(0.94);
+}
+
 .kanban-dropzone {
   padding: var(--sp-4);
+  background: #f8fafc;
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
@@ -224,18 +295,18 @@
 }
 
 .kanban-dropzone.drag-over {
-  background: var(--primary-light);
-  outline: 2px dashed var(--primary);
+  background: #eff6ff;
+  outline: 2px dashed #6366f1;
   outline-offset: -4px;
 }
 
 /* Task Cards inside Kanban */
 .task-card {
-  background: var(--white);
-  border: 1px solid var(--gray-200);
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
   border-radius: var(--radius);
   padding: var(--sp-4);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.04);
   cursor: grab;
   transition: all var(--transition);
   display: flex;
@@ -244,8 +315,8 @@
 }
 
 .task-card:hover {
-  border-color: var(--gray-300);
-  box-shadow: var(--shadow-md);
+  border-color: #94a3b8;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
   transform: translateY(-2px);
 }
 
@@ -256,9 +327,64 @@
 
 .task-card-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: var(--sp-2);
+}
+
+/* Task Card Action Buttons (Edit & Delete) */
+.task-card-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  opacity: 0.65;
+  transition: opacity 0.15s ease;
+}
+
+.task-card:hover .task-card-actions,
+.task-card-actions:focus-within {
+  opacity: 1;
+}
+
+.card-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--gray-400);
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-btn svg {
+  display: block;
+  pointer-events: none;
+}
+
+.card-btn-edit:hover {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #4f46e5;
+  transform: translateY(-1px);
+}
+
+.card-btn-delete:hover {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626;
+  transform: translateY(-1px);
+}
+
+.card-btn:active {
+  transform: scale(0.92);
 }
 
 .task-card-title {
@@ -966,9 +1092,127 @@
   color: #f3f4f6;
 }
 
+/* Dark Mode Board, Columns, Headers & Task Card Contrast */
+[data-theme="dark"] #app-container {
+  background: #0a0a0a;
+}
+
+[data-theme="dark"] .topbar {
+  background: #111111;
+  border-bottom-color: #222222;
+}
+
+[data-theme="dark"] .kanban-column {
+  background: #121212;
+  border-color: #242424;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="dark"] .kanban-column-header {
+  background: #181818;
+  border-bottom-color: #262626;
+}
+
+[data-theme="dark"] #column-todo .kanban-column-header {
+  border-top-color: #6366f1;
+}
+
+[data-theme="dark"] #column-in-progress .kanban-column-header {
+  border-top-color: #f59e0b;
+}
+
+[data-theme="dark"] #column-done .kanban-column-header {
+  border-top-color: #10b981;
+}
+
+[data-theme="dark"] .kanban-column-title {
+  color: #f3f4f6;
+}
+
+[data-theme="dark"] #count-todo {
+  background: rgba(99, 102, 241, 0.18);
+  color: #a5b4fc;
+  border-color: rgba(99, 102, 241, 0.35);
+}
+
+[data-theme="dark"] #count-in_progress {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+[data-theme="dark"] #count-done {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+[data-theme="dark"] .column-quick-add {
+  background: #1e1e1e;
+  border-color: #303030;
+  color: #a3a3a3;
+  box-shadow: none;
+}
+
+[data-theme="dark"] .column-quick-add:hover {
+  background: #282828;
+  border-color: #444444;
+  color: #ffffff;
+}
+
+[data-theme="dark"] .kanban-dropzone {
+  background: #121212;
+}
+
+[data-theme="dark"] .kanban-dropzone.drag-over {
+  background: rgba(99, 102, 241, 0.12);
+  outline-color: #6366f1;
+}
+
+[data-theme="dark"] .task-card {
+  background: #1c1c1c;
+  border-color: #2c2c2c;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .task-card:hover {
+  background: #232323;
+  border-color: #3d3d3d;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .task-card-title {
+  color: #f9fafb;
+}
+
+[data-theme="dark"] .task-card-desc {
+  color: #a3a3a3;
+}
+
+[data-theme="dark"] .card-btn {
+  color: #737373;
+}
+
+[data-theme="dark"] .card-btn-edit:hover {
+  background: rgba(99, 102, 241, 0.18);
+  border-color: rgba(99, 102, 241, 0.4);
+  color: #a5b4fc;
+}
+
+[data-theme="dark"] .card-btn-delete:hover {
+  background: rgba(239, 68, 68, 0.18);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
+[data-theme="dark"] .empty-column {
+  color: #666666;
+  border-color: #262626;
+}
+
 /* Dark Mode Overrides for Task Cards & Shift Buttons */
 [data-theme="dark"] .task-card-footer {
-  border-top-color: #222222;
+  border-top-color: #282828;
 }
 
 [data-theme="dark"] .task-due-date {

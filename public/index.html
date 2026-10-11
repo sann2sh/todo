@@ -11,8 +11,8 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/global.css?v=2.4">
-  <link rel="stylesheet" href="style.css?v=2.4">
+  <link rel="stylesheet" href="assets/css/global.css?v=2.5">
+  <link rel="stylesheet" href="style.css?v=2.5">
 </head>
 
 <body>
@@ -295,9 +295,14 @@
           <div class="kanban-column-header">
             <div class="kanban-column-title">
               <span>📌 To Do</span>
-              <span class="badge badge-inactive" id="count-todo">0</span>
+              <span class="badge" id="count-todo">0</span>
             </div>
-            <button class="btn btn-outline btn-sm column-quick-add" data-status="todo" title="Quick add task">➕</button>
+            <button class="column-quick-add" data-status="todo" title="Quick add task" aria-label="Quick add task">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
           </div>
           <div class="kanban-dropzone" id="cards-todo" data-status="todo">
             <!-- Dynamically populated -->
@@ -309,10 +314,14 @@
           <div class="kanban-column-header">
             <div class="kanban-column-title">
               <span>⏰ In Progress</span>
-              <span class="badge badge-expiring" id="count-in_progress">0</span>
+              <span class="badge" id="count-in_progress">0</span>
             </div>
-            <button class="btn btn-outline btn-sm column-quick-add" data-status="in_progress"
-              title="Quick add task">➕</button>
+            <button class="column-quick-add" data-status="in_progress" title="Quick add task" aria-label="Quick add task">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
           </div>
           <div class="kanban-dropzone" id="cards-in_progress" data-status="in_progress">
             <!-- Dynamically populated -->
@@ -324,9 +333,14 @@
           <div class="kanban-column-header">
             <div class="kanban-column-title">
               <span>✓ Completed</span>
-              <span class="badge badge-active" id="count-done">0</span>
+              <span class="badge" id="count-done">0</span>
             </div>
-            <button class="btn btn-outline btn-sm column-quick-add" data-status="done" title="Quick add task">➕</button>
+            <button class="column-quick-add" data-status="done" title="Quick add task" aria-label="Quick add task">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
           </div>
           <div class="kanban-dropzone" id="cards-done" data-status="done">
             <!-- Dynamically populated -->
@@ -522,8 +536,8 @@
   <!-- Toast Notification Container -->
   <div id="toast-container" class="toast-container"></div>
 
-  <script src="assets/js/global.js?v=2.4"></script>
-  <script src="app.js?v=2.4"></script>
+  <script src="assets/js/global.js?v=2.5"></script>
+  <script src="app.js?v=2.5"></script>
 </body>
 
 </html>
